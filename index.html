@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Radar UMKM Campurejo — Peta Interaktif UMKM Desa Campurejo</title>
+    
+    <!-- Meta Tags SEO -->
+    <meta name="description" content="Temukan dan jelajahi produk serta jasa unggulan dari pelaku UMKM di Desa Campurejo, Bojonegoro melalui peta interaktif. Hubungi langsung via WhatsApp.">
+    <meta name="keywords" content="UMKM Campurejo, Radar UMKM, Bojonegoro, Peta UMKM, KKN Campurejo, UMKM Bojonegoro, Kuliner Campurejo">
+    <meta name="author" content="KKN Desa Campurejo Bojonegoro">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Radar UMKM Campurejo — Peta Interaktif">
+    <meta property="og:description" content="Temukan produk dan jasa unggulan dari pelaku UMKM di Desa Campurejo, Bojonegoro. Langsung terhubung via WhatsApp.">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+          
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Container Utama Peta -->
+    <div id="map"></div>
+
+    <!-- UI Panel Floating -->
+    <main class="app-container">
+        
+        <!-- Header & Pencarian Panel -->
+        <section class="floating-panel search-panel">
+            <header class="app-header">
+                <div class="logo-area">
+                    <div class="logo-text-container">
+                        <span class="logo-title">Radar UMKM</span>
+                        <span class="logo-subtitle">Desa Campurejo</span>
+                    </div>
+                    <img src="asset_gambar/logo_panjang.png" alt="Logo KKN UPN" class="app-logo-img">
+                </div>
+            </header>
+
+            <!-- Search Input -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Cari nama UMKM atau produk..." autocomplete="off">
+                <button id="clear-search" class="clear-btn" aria-label="Hapus pencarian">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Categories Filter (Horizontal Scrollable) -->
+            <div class="category-tabs" id="category-tabs" role="tablist">
+                <button class="category-tab active" data-category="all" role="tab" aria-selected="true">Semua</button>
+                <button class="category-tab" data-category="Kuliner" role="tab" aria-selected="false"><i class="fa-solid fa-utensils"></i> Kuliner</button>
+                <button class="category-tab" data-category="Jasa" role="tab" aria-selected="false"><i class="fa-solid fa-screwdriver-wrench"></i> Jasa</button>
+                <button class="category-tab" data-category="Kerajinan" role="tab" aria-selected="false"><i class="fa-solid fa-scissors"></i> Kerajinan</button>
+                <button class="category-tab" data-category="Pertanian" role="tab" aria-selected="false"><i class="fa-solid fa-wheat-awn"></i> Pertanian</button>
+                <button class="category-tab" data-category="Belanja" role="tab" aria-selected="false"><i class="fa-solid fa-store"></i> Belanja</button>
+            </div>
+        </section>
+
+        <!-- Bottom Sheet / Daftar UMKM Panel -->
+        <section class="floating-panel list-panel" id="list-panel">
+            <!-- Handle untuk Geser Bottom Sheet pada Mobile -->
+            <div class="bottom-sheet-handle"></div>
+            
+            <div class="list-header">
+                <h2 class="list-title">Pelaku Usaha Terdaftar (<span id="umkm-count">0</span>)</h2>
+                <button id="toggle-list-btn" class="toggle-list-btn" aria-label="Toggle Daftar">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable List Area -->
+            <div class="list-content" id="umkm-list-container">
+                <!-- Skeleton Loader saat Loading -->
+                <div class="skeleton-wrapper" id="list-skeleton">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+                
+                <!-- Daftar UMKM akan di-render di sini secara dinamis -->
+                <div class="umkm-list" id="umkm-list" style="display: none;"></div>
+                
+                <!-- Kredit Pembuat (KKN 22) -->
+                <div class="list-footer-credits">
+                    Dibuat dengan <i class="fa-solid fa-heart animate-pulse"></i> oleh Kelompok KKN 22 Bojonegoro 2026 UPN JATIM
+                </div>
+                
+                <!-- Pesan jika Hasil Pencarian Kosong -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <i class="fa-solid fa-face-frown empty-icon"></i>
+                    <h3>UMKM Tidak Ditemukan</h3>
+                    <p>Coba gunakan kata kunci atau kategori yang lain.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlay Loading Awal -->
+    <div id="initial-loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h2>Radar UMKM Campurejo</h2>
+            <p>Memuat peta dan data UMKM...</p>
+        </div>
+    </div>
+
+    <!-- Floating Info KKN Button -->
+    <button id="info-kkn-btn" class="floating-info-btn" aria-label="Informasi KKN">
+        <i class="fa-solid fa-users-gear"></i>
+    </button>
+
+    <!-- Modal Informasi KKN -->
+    <div id="info-kkn-modal" class="modal-overlay" style="display: none;">
+        <div class="story-card info-kkn-card">
+            <button id="close-info-kkn-btn" class="close-modal-btn" aria-label="Tutup Info">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="info-kkn-header">
+                <img src="asset_gambar/logo_panjang.png" alt="Logo KKN 22 UPN Veteran Jawa Timur" class="info-logo-img">
+            </div>
+            <div class="story-content">
+                <h2 class="story-title" style="text-align: center; margin-bottom: 4px;">Kelompok KKN 22 Bojonegoro 2026</h2>
+                <h3 style="font-size: 0.95rem; font-weight: 600; text-align: center; color: var(--primary); margin-bottom: 16px;">UPN "Veteran" Jawa Timur</h3>
+                <div class="story-narrative" style="text-align: justify; font-size: 0.85rem; color: var(--neutral-dark);">
+                    Program Pengabdian Masyarakat (KKN) ini berfokus pada digitalisasi dan pengembangan literasi digital bagi pelaku UMKM di Desa Campurejo, Kecamatan Bojonegoro. Radar UMKM ini hadir sebagai sarana publikasi digital terpadu untuk mengenalkan potensi usaha lokal desa secara visual dan interaktif ke masyarakat luas.
+                </div>
+                <div style="margin-top: 16px; border-top: 1px solid var(--neutral-light); padding-top: 16px;">
+                    <h4 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--neutral-dark);">Tim Pengembang:</h4>
+                    <ul style="font-size: 0.8rem; list-style-type: disc; margin-left: 20px; line-height: 1.6; color: var(--neutral-dark);">
+                         <li>Divisi IT &amp; Digitalisasi Program Kerja KKN 22</li>
+                         <li>Seluruh Rekan Anggota Kelompok KKN 22 Bojonegoro</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Penanganan Error & Fallback -->
+    <div id="error-overlay" class="loader-overlay error-overlay" style="display: none;">
+        <div class="error-card">
+            <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+            <h2>Koneksi Data Gagal</h2>
+            <p>Gagal mengambil data terbaru dari Google Sheets. Pastikan koneksi internet Anda aktif.</p>
+            <div class="error-actions">
+                <button id="retry-fetch-btn" class="btn btn-primary"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
+                <button id="load-fallback-btn" class="btn btn-secondary"><i class="fa-solid fa-file-shield"></i> Gunakan Data Cadangan</button>
+            </div>
+            <p class="error-details" id="error-details"></p>
+        </div>
+    </div>
+
+    <!-- Toast Alert Copy Link -->
+    <div id="toast-alert" class="toast-alert" style="display: none;">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Tautan lokasi berhasil disalin!</span>
+    </div>
+
+    <!-- Modal Detail Kisah/Cerita UMKM -->
+    <div id="story-modal" class="modal-overlay" style="display: none;">
+        <div class="story-card">
+            <button id="close-story-btn" class="close-modal-btn" aria-label="Tutup Cerita">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="story-header-img" id="story-img-container" style="position: relative;">
+                <div class="story-gallery" id="story-gallery"></div>
+                <div class="gallery-dots" id="gallery-dots"></div>
+            </div>
+            <div class="story-content">
+                <div class="story-meta">
+                    <span class="badge" id="story-category">Kategori</span>
+                </div>
+                <h2 class="story-title" id="story-title">Judul Kisah</h2>
+                <div class="story-narrative" id="story-text">
+                    Narasi cerita...
+                </div>
+                <div class="story-actions">
+                    <a href="" id="story-wa-btn" target="_blank" class="btn btn-primary"><i class="fa-brands fa-whatsapp"></i> Hubungi WhatsApp</a>
+                    <a href="" id="story-maps-btn" target="_blank" class="btn btn-secondary"><i class="fa-solid fa-map-location-dot"></i> Rute Google Maps</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet.js JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+            
+    <!-- PapaParse JS (CSV Parser) -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js" crossorigin="anonymous"></script>
+
+            
+    <!-- Custom JS Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

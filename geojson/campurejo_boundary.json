@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Desa Campurejo",
+        "description": "Batas Administratif Desa Campurejo, Kecamatan Bojonegoro, Kabupaten Bojonegoro"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [111.895, -7.140],
+            [111.905, -7.138],
+            [111.912, -7.140],
+            [111.915, -7.148],
+            [111.910, -7.155],
+            [111.900, -7.158],
+            [111.892, -7.153],
+            [111.895, -7.140]
+          ]
+        ]
+      }
+    }
+  ]
+}
