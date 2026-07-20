@@ -43,11 +43,11 @@
         <section class="floating-panel search-panel">
             <header class="app-header">
                 <div class="logo-area">
+                    <img src="asset_gambar/logo_main.png" alt="Logo KKN UPN" class="app-logo-img">
                     <div class="logo-text-container">
                         <span class="logo-title">Radar UMKM</span>
                         <span class="logo-subtitle">Desa Campurejo</span>
                     </div>
-                    <img src="asset_gambar/logo_panjang.png" alt="Logo KKN UPN" class="app-logo-img">
                 </div>
             </header>
 
@@ -131,21 +131,81 @@
             <button id="close-info-kkn-btn" class="close-modal-btn" aria-label="Tutup Info">
                 <i class="fa-solid fa-xmark"></i>
             </button>
+            
+            <!-- Logo Header -->
             <div class="info-kkn-header">
                 <img src="asset_gambar/logo_panjang.png" alt="Logo KKN 22 UPN Veteran Jawa Timur" class="info-logo-img">
             </div>
-            <div class="story-content">
-                <h2 class="story-title" style="text-align: center; margin-bottom: 4px;">Kelompok KKN 22 Bojonegoro 2026</h2>
-                <h3 style="font-size: 0.95rem; font-weight: 600; text-align: center; color: var(--primary); margin-bottom: 16px;">UPN "Veteran" Jawa Timur</h3>
-                <div class="story-narrative" style="text-align: justify; font-size: 0.85rem; color: var(--neutral-dark);">
-                    Program Pengabdian Masyarakat (KKN) ini berfokus pada digitalisasi dan pengembangan literasi digital bagi pelaku UMKM di Desa Campurejo, Kecamatan Bojonegoro. Radar UMKM ini hadir sebagai sarana publikasi digital terpadu untuk mengenalkan potensi usaha lokal desa secara visual dan interaktif ke masyarakat luas.
+            
+            <div class="info-kkn-body">
+                <!-- Title & Subtitle -->
+                <div class="info-kkn-title-section">
+                    <h2 class="kkn-title">Kelompok KKN 22 Bojonegoro 2026</h2>
+                    <h3 class="kkn-subtitle">UPN "Veteran" Jawa Timur</h3>
+                    <div class="kkn-divider"></div>
                 </div>
-                <div style="margin-top: 16px; border-top: 1px solid var(--neutral-light); padding-top: 16px;">
-                    <h4 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--neutral-dark);">Tim Pengembang:</h4>
-                    <ul style="font-size: 0.8rem; list-style-type: disc; margin-left: 20px; line-height: 1.6; color: var(--neutral-dark);">
-                         <li>Divisi IT &amp; Digitalisasi Program Kerja KKN 22</li>
-                         <li>Seluruh Rekan Anggota Kelompok KKN 22 Bojonegoro</li>
-                    </ul>
+                
+                <!-- Narrative Paragraph -->
+                <p class="kkn-description">
+                    Program Pengabdian Masyarakat (KKN) ini berfokus pada <strong>digitalisasi</strong> dan pengembangan <strong>literasi digital</strong> bagi pelaku UMKM di Desa Campurejo, Kecamatan Bojonegoro. Aplikasi <strong>Radar UMKM</strong> ini hadir sebagai sarana publikasi digital terpadu untuk mengenalkan potensi usaha lokal secara interaktif dan menjangkau pasar yang lebih luas.
+                </p>
+                
+                <!-- Stats Grid -->
+                <div class="kkn-stats-grid">
+                    <div class="kkn-stat-card">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">UMKM Terdata</span>
+                    </div>
+                    <div class="kkn-stat-card">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Kategori Usaha</span>
+                    </div>
+                    <div class="kkn-stat-card">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Peta Digital</span>
+                    </div>
+                </div>
+
+                <!-- Team Grid Section -->
+                <div class="kkn-team-section">
+                    <h4 class="kkn-section-title"><i class="fa-solid fa-users-gear"></i> Tim Pengembang</h4>
+                    <div class="kkn-teams-flex">
+                        <div class="kkn-team-badge">
+                            <span class="badge-icon"><i class="fa-solid fa-code"></i></span>
+                            <div class="badge-text">
+                                <span class="badge-title">Divisi IT &amp; Digitalisasi</span>
+                                <span class="badge-desc">Rancang &amp; Kembangkan Aplikasi</span>
+                            </div>
+                        </div>
+                        <div class="kkn-team-badge">
+                            <span class="badge-icon"><i class="fa-solid fa-palette"></i></span>
+                            <div class="badge-text">
+                                <span class="badge-title">Divisi Publikasi &amp; Desain</span>
+                                <span class="badge-desc">Visual, Media &amp; Konten Digital</span>
+                            </div>
+                        </div>
+                        <div class="kkn-team-badge">
+                            <span class="badge-icon"><i class="fa-solid fa-comments"></i></span>
+                            <div class="badge-text">
+                                <span class="badge-title">Divisi Hubungan Masyarakat</span>
+                                <span class="badge-desc">Sosialisasi &amp; Koordinasi Pelaku Usaha</span>
+                            </div>
+                        </div>
+                        <div class="kkn-team-badge flex-full-width">
+                            <span class="badge-icon"><i class="fa-solid fa-people-group"></i></span>
+                            <div class="badge-text">
+                                <span class="badge-title">Kelompok KKN 22 Bojonegoro 2026</span>
+                                <span class="badge-desc">UPN "Veteran" Jawa Timur</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button / Instagram Link -->
+                <div class="kkn-actions-section">
+                    <a href="https://www.instagram.com/kkn22.campurejo/" target="_blank" class="kkn-instagram-btn">
+                        <i class="fa-brands fa-instagram"></i> Ikuti Perjalanan Kami di Instagram
+                    </a>
                 </div>
             </div>
         </div>

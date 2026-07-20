@@ -1579,4 +1579,434 @@ html {
     }
 }
 
+/* ==========================================================================
+   KKN ABOUT US MODAL ENHANCEMENTS (REFINED)
+   ========================================================================== */
+.info-kkn-card {
+    max-width: 500px;
+    border-radius: var(--radius-lg);
+    background-color: #fff;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+}
+
+.info-kkn-header {
+    background-color: #ffffff;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--neutral-light);
+    position: relative;
+}
+
+.info-logo-img {
+    max-height: 40px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.info-kkn-body {
+    padding: 24px 28px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.info-kkn-title-section {
+    text-align: center;
+}
+
+.kkn-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--neutral-dark);
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+}
+
+.kkn-subtitle {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kkn-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    margin: 12px auto 0 auto;
+    border-radius: 2px;
+}
+
+.kkn-description {
+    font-size: 0.82rem;
+    color: var(--neutral-medium);
+    line-height: 1.6;
+    text-align: justify;
+    margin: 0;
+}
+
+.kkn-description strong {
+    color: var(--neutral-dark);
+    font-weight: 600;
+}
+
+/* Stats Section */
+.kkn-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.kkn-stat-card {
+    background: var(--primary-bg);
+    border: 1px solid rgba(20, 110, 80, 0.08);
+    border-radius: var(--radius-md);
+    padding: 10px 8px;
+    text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.kkn-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(20, 110, 80, 0.06);
+    border-color: var(--primary-light);
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--neutral-medium);
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+/* Team badges styling */
+.kkn-team-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kkn-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--neutral-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.kkn-section-title i {
+    color: var(--primary);
+}
+
+.kkn-teams-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.kkn-team-badge {
+    background-color: var(--neutral-light);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition-smooth);
+}
+
+.kkn-team-badge:hover {
+    background-color: #fff;
+    border-color: var(--primary-light);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.badge-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--primary-bg);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.badge-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.badge-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--neutral-dark);
+}
+
+.badge-desc {
+    font-size: 0.68rem;
+    color: var(--neutral-medium);
+    font-weight: 500;
+}
+
+.flex-full-width {
+    background-color: var(--primary-bg);
+    border-color: rgba(20, 110, 80, 0.1);
+}
+
+.flex-full-width .badge-icon {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+/* Instagram Button */
+.kkn-instagram-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.2);
+    transition: var(--transition-bounce);
+}
+
+.kkn-instagram-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 39, 67, 0.35);
+}
+
+@media (max-width: 480px) {
+    .info-kkn-body {
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .kkn-stats-grid {
+        gap: 8px;
+    }
+}
+
+/* ==========================================================================
+   WEEKLY SCHEDULE DROPDOWN COMPONENT (INTERACTIVE)
+   ========================================================================== */
+
+.status-toggle-btn {
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition-smooth);
+}
+
+.status-toggle-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-chevron {
+    transition: transform 0.25s ease;
+    display: inline-block;
+}
+
+.active-toggle .toggle-chevron {
+    transform: rotate(180deg);
+}
+
+.schedule-dropdown {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background-color: var(--primary-bg);
+    border: 1px solid rgba(var(--primary-hue), 70%, 22%, 0.08);
+    border-left: 3px solid var(--primary-medium);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin: 8px 0 4px 0;
+    font-size: 0.72rem;
+    color: var(--neutral-dark);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    width: 100%;
+    box-sizing: border-box;
+    animation: schedule-slide-down 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+@keyframes schedule-slide-down {
+    0% { opacity: 0; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.schedule-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 4px 0 !important;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.05) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.schedule-row:last-child {
+    border-bottom: none !important;
+}
+
+.day-name {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-weight: 500 !important;
+}
+
+.day-time {
+    font-weight: 600 !important;
+    color: var(--neutral-medium) !important;
+}
+
+.today-row {
+    color: var(--primary-medium) !important;
+    font-weight: 700 !important;
+}
+
+.today-row .day-time {
+    color: var(--primary) !important;
+}
+
+.schedule-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+}
+
+.dot-open {
+    background-color: hsl(142, 70%, 45%) !important;
+    box-shadow: 0 0 4px rgba(74, 201, 89, 0.4) !important;
+}
+
+.dot-closed {
+    background-color: hsl(355, 75%, 45%) !important;
+    box-shadow: 0 0 4px rgba(220, 39, 67, 0.4) !important;
+}
+
+/* Adjust map popup schedule styling so it fits nicely */
+.leaflet-popup-content .schedule-dropdown {
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    border-left: 3px solid var(--accent) !important;
+    margin: 6px 0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ==========================================================================
+   POPUP SWIPEABLE GALLERY COMPONENT
+   ========================================================================== */
+
+.popup-gallery-container {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    overflow: hidden;
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+}
+
+.popup-gallery {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    width: 100% !important;
+    height: 100% !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    cursor: grab;
+}
+
+.popup-gallery::-webkit-scrollbar {
+    display: none !important;
+}
+
+.popup-gallery img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: start !important;
+}
+
+.popup-gallery-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ==========================================================================
+   SOCIAL MEDIA BUTTONS
+   ========================================================================== */
+
+.umkm-card-sosmed,
+.popup-sosmed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0 4px 0;
+}
+
+.sosmed-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: color-mix(in srgb, var(--sosmed-color) 12%, white);
+    color: var(--sosmed-color);
+    border: 1px solid color-mix(in srgb, var(--sosmed-color) 25%, transparent);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.sosmed-btn:hover {
+    background-color: var(--sosmed-color);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--sosmed-color) 40%, transparent);
+}
 
