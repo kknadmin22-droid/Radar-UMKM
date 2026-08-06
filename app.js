@@ -19,6 +19,9 @@ let markersLayer = null;
 let boundaryLayer = null;
 let activeCategory = "all";
 let searchQuery = "";
+let isOpenNowOnly = false;
+let isFavoritesOnly = false;
+let favoritesList = JSON.parse(localStorage.getItem("radar_umkm_favorites") || "[]");
 const markerInstances = {}; // Menyimpan instansi marker berdasarkan id_unik untuk pencarian / deep-linking
 const cardInstances = {}; // Menyimpan DOM card untuk menghindari rebuild berulang
 let isFirstRender = true;
@@ -34,6 +37,7 @@ const categoryMeta = {
 
 // Document Ready
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("%c[Radar UMKM Debug] Loaded Version 20260726_v2 (Optimized Canvas Map + Header Text Left)", "color: #10b981; font-weight: bold; font-size: 14px;");
     initMap();
     initUIEventListeners();
     loadBoundaryGeoJSON();
@@ -47,14 +51,25 @@ function initMap() {
     // Inisialisasi peta Leaflet.js
     map = L.map("map", {
         zoomControl: false, // Matikan zoom default untuk diposisikan ulang
-        attributionControl: true
+        attributionControl: true,
+        preferCanvas: true, // Gunakan canvas rendering untuk performa lebih mulus
+        zoomSnap: 0.5,      // Zoom lebih halus berjarak 0.5 step (pro level)
+        wheelDebounceTime: 40,
+        wheelPxPerZoomLevel: 120,
+        zoomAnimation: true,
+        fadeAnimation: true,
+        markerZoomAnimation: true,
+        inertia: true,
+        inertiaDeceleration: 3000
     }).setView(CAMPUREJO_CENTER, DEFAULT_ZOOM);
 
     // Gunakan Tile Layer CartoDB Positron (OSM-based, modern, clean, gratis)
     L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 20
+        maxZoom: 20,
+        keepBuffer: 4,
+        tileSize: 256
     }).addTo(map);
 
     // Posisikan kontrol zoom di kanan bawah (tidak mengganggu panel mengambang)
@@ -203,6 +218,8 @@ function renderAppContent() {
     
     // 1. Buat marker dan card sekali saja di awal
     if (isFirstRender) {
+        window.umkmData = umkmData;
+        updateInfoKKNStats();
         listContainer.innerHTML = "";
         markersLayer.clearLayers();
         umkmData.forEach(item => {
@@ -229,8 +246,11 @@ function renderAppContent() {
             item.category.toLowerCase().includes(searchLower) ||
             item.description.toLowerCase().includes(searchLower) ||
             (item.produkUnggulan && item.produkUnggulan.toLowerCase().includes(searchLower));
+
+        const matchesOpenNow = !isOpenNowOnly || (isCurrentlyOpen(item.jamOperasional, item.hariOperasional, item.jamOperasionalKhusus) === true);
+        const matchesFavorite = !isFavoritesOnly || favoritesList.includes(item.id);
             
-        const isVisible = matchesCategory && matchesSearch;
+        const isVisible = matchesCategory && matchesSearch && matchesOpenNow && matchesFavorite;
         
         // Toggle Card
         const card = cardInstances[item.id];
@@ -318,12 +338,18 @@ function createPopupHTML(item, meta) {
             ).join('');
             photoHTML = `
                 <div class="popup-gallery-container">
-                    <div class="popup-gallery" onscroll="this.nextElementSibling.querySelector('.badge-idx').textContent = Math.round(this.scrollLeft / this.clientWidth) + 1">
+                    <button class="nav-gallery-btn popup-nav-btn prev-btn" onclick="event.stopPropagation(); const g = this.parentElement.querySelector('.popup-gallery'); if(g) g.scrollBy({left: -g.clientWidth, behavior: 'smooth'});" aria-label="Gambar Sebelumnya">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="popup-gallery" onscroll="if(!this._ticking){this._ticking=true; requestAnimationFrame(()=>{const b=this.parentElement.querySelector('.badge-idx'); if(b && this.clientWidth>0) b.textContent=Math.round(this.scrollLeft/this.clientWidth)+1; this._ticking=false;});}">
                         ${images}
                     </div>
                     <div class="popup-gallery-badge">
                         <i class="fa-regular fa-images"></i> <span class="badge-idx">1</span>/${item.photoUrls.length}
                     </div>
+                    <button class="nav-gallery-btn popup-nav-btn next-btn" onclick="event.stopPropagation(); const g = this.parentElement.querySelector('.popup-gallery'); if(g) g.scrollBy({left: g.clientWidth, behavior: 'smooth'});" aria-label="Gambar Berikutnya">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
             `;
         }
@@ -378,6 +404,13 @@ function createPopupHTML(item, meta) {
           `</div>`
         : '';
 
+    const isFav = favoritesList.includes(item.id);
+    const favBtnHTML = `
+        <button class="fav-card-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${item.id}', this)" title="${isFav ? 'Hapus dari Favorit' : 'Simpan ke Favorit'}" aria-label="Favorit">
+            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+        </button>
+    `;
+
     return `
         <div class="popup-container">
             ${photoHTML}
@@ -387,7 +420,10 @@ function createPopupHTML(item, meta) {
                     ${statusHTML}
                 </div>
                 ${scheduleHTML}
-                <h3 class="popup-title">${item.name}</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <h3 class="popup-title" style="margin: 0;">${item.name}</h3>
+                    ${favBtnHTML}
+                </div>
                 <p class="popup-desc">${item.description}</p>
                 ${popupSosmedHTML}
                 <div class="popup-actions">
@@ -451,9 +487,16 @@ function createUMKMCard(item) {
         `;
     }
 
-    // D. Tombol Share Link
+    // D. Tombol Share Link & Favorit
+    const isFav = favoritesList.includes(item.id);
+    const favBtnHTML = `
+        <button class="fav-card-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${item.id}', this)" title="${isFav ? 'Hapus dari Favorit' : 'Simpan ke Favorit'}" aria-label="Favorit">
+            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+        </button>
+    `;
+
     const shareBtnHTML = `
-        <button class="share-card-btn" onclick="event.stopPropagation(); shareLink('${item.id}')" aria-label="Bagikan lokasi">
+        <button class="share-card-btn" onclick="event.stopPropagation(); shareLink('${item.id}')" aria-label="Bagikan lokasi" title="Bagikan lokasi">
             <i class="fa-regular fa-share-from-square"></i>
         </button>
     `;
@@ -485,7 +528,10 @@ function createUMKMCard(item) {
                     ${statusHTML}
                 </div>
             </div>
-            ${shareBtnHTML}
+            <div style="display: flex; align-items: center; gap: 4px;">
+                ${favBtnHTML}
+                ${shareBtnHTML}
+            </div>
         </div>
         ${scheduleHTML}
         <p class="umkm-card-desc">${item.description}</p>
@@ -604,8 +650,32 @@ function initUIEventListeners() {
         renderAppContent();
     });
 
+    // Filter Buka Sekarang
+    const btnFilterOpen = document.getElementById("btn-filter-open");
+    if (btnFilterOpen) {
+        btnFilterOpen.addEventListener("click", (e) => {
+            e.stopPropagation();
+            isOpenNowOnly = !isOpenNowOnly;
+            btnFilterOpen.classList.toggle("active", isOpenNowOnly);
+            btnFilterOpen.setAttribute("aria-selected", isOpenNowOnly ? "true" : "false");
+            renderAppContent();
+        });
+    }
+
+    // Filter Favorit
+    const btnFilterFav = document.getElementById("btn-filter-fav");
+    if (btnFilterFav) {
+        btnFilterFav.addEventListener("click", (e) => {
+            e.stopPropagation();
+            isFavoritesOnly = !isFavoritesOnly;
+            btnFilterFav.classList.toggle("active", isFavoritesOnly);
+            btnFilterFav.setAttribute("aria-selected", isFavoritesOnly ? "true" : "false");
+            renderAppContent();
+        });
+    }
+
     // Klik Tabs Kategori
-    const categoryButtons = document.querySelectorAll(".category-tab");
+    const categoryButtons = document.querySelectorAll(".category-tab[data-category]");
     categoryButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             categoryButtons.forEach(b => {
@@ -622,36 +692,36 @@ function initUIEventListeners() {
     });
 
 
-    // Panel Bottom Sheet (Mobile Toggle)
+    // Panel Bottom Sheet & Desktop List Toggle
     const toggleListBtn = document.getElementById("toggle-list-btn");
     const listPanel = document.getElementById("list-panel");
     const listHeader = document.querySelector(".list-header");
 
     const setCollapsed = (collapsed) => {
-        if (window.innerWidth > 768) return;
         if (collapsed) {
             listPanel.classList.add("collapsed");
-            toggleListBtn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+            if (toggleListBtn) toggleListBtn.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
         } else {
             listPanel.classList.remove("collapsed");
-            toggleListBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+            if (toggleListBtn) toggleListBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
         }
     };
 
-    const toggleBottomSheet = () => {
-        if (window.innerWidth <= 768) {
-            const isCollapsed = listPanel.classList.contains("collapsed");
-            setCollapsed(!isCollapsed);
-        }
+    const toggleListPanel = () => {
+        const isCollapsed = listPanel.classList.contains("collapsed");
+        setCollapsed(!isCollapsed);
     };
 
-    toggleListBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleBottomSheet();
-    });
+    if (toggleListBtn) {
+        toggleListBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleListPanel();
+        });
+    }
     
-    // Klik header juga toggle
-    listHeader.addEventListener("click", () => toggleBottomSheet());
+    if (listHeader) {
+        listHeader.addEventListener("click", () => toggleListPanel());
+    }
 
     // ── Touch swipe gesture untuk bottom sheet ────────────────────────────────
     let touchStartY = 0;
@@ -979,6 +1049,8 @@ function openStoryModal(id) {
     const imgContainer = document.getElementById("story-img-container");
     const gallery = document.getElementById("story-gallery");
     const dotsContainer = document.getElementById("gallery-dots");
+    const prevBtn = document.getElementById("prev-image-btn");
+    const nextBtn = document.getElementById("next-image-btn");
     const category = document.getElementById("story-category");
     const title = document.getElementById("story-title");
     const text = document.getElementById("story-text");
@@ -988,6 +1060,7 @@ function openStoryModal(id) {
     // Atur Galeri Foto
     gallery.innerHTML = "";
     dotsContainer.innerHTML = "";
+    gallery.scrollLeft = 0; // Reset scroll position to first image
     
     if (item.photoUrls && item.photoUrls.length > 0) {
         item.photoUrls.forEach((url, index) => {
@@ -1001,6 +1074,9 @@ function openStoryModal(id) {
         
         if (item.photoUrls.length > 1) {
             dotsContainer.style.display = "flex";
+            if (prevBtn) prevBtn.style.display = "flex";
+            if (nextBtn) nextBtn.style.display = "flex";
+
             item.photoUrls.forEach((_, index) => {
                 const dot = document.createElement("span");
                 dot.className = `gallery-dot ${index === 0 ? 'active' : ''}`;
@@ -1020,12 +1096,33 @@ function openStoryModal(id) {
                     }
                 });
             };
+
+            // Event listener tombol panah navigasi galeri
+            if (prevBtn) {
+                prevBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const width = gallery.clientWidth;
+                    gallery.scrollBy({ left: -width, behavior: 'smooth' });
+                };
+            }
+            if (nextBtn) {
+                nextBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const width = gallery.clientWidth;
+                    gallery.scrollBy({ left: width, behavior: 'smooth' });
+                };
+            }
         } else {
             dotsContainer.style.display = "none";
+            if (prevBtn) prevBtn.style.display = "none";
+            if (nextBtn) nextBtn.style.display = "none";
+            gallery.onscroll = null;
         }
         imgContainer.style.display = "block";
     } else {
         imgContainer.style.display = "none";
+        if (prevBtn) prevBtn.style.display = "none";
+        if (nextBtn) nextBtn.style.display = "none";
     }
 
     // Atur Kategori & Jam
@@ -1049,6 +1146,21 @@ function openStoryModal(id) {
 
     // Atur Link Maps
     mapsBtn.href = item.linkGmaps ? item.linkGmaps : `https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lng}`;
+
+    // Atur Tombol Favorit Modal
+    const storyFavBtn = document.getElementById("story-fav-btn");
+    if (storyFavBtn) {
+        const updateStoryFavUI = () => {
+            const isFav = favoritesList.includes(item.id);
+            storyFavBtn.className = `btn btn-fav-modal ${isFav ? 'active' : ''}`;
+            storyFavBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${isFav ? 'Tersimpan' : 'Favorit'}`;
+        };
+        updateStoryFavUI();
+        storyFavBtn.onclick = () => {
+            toggleFavorite(item.id);
+            updateStoryFavUI();
+        };
+    }
 
     // Tampilkan Modal
     modal.style.display = "flex";
@@ -1172,8 +1284,32 @@ function cleanCoordinate(val) {
     return parseFloat(str);
 }
 
+// Hitung & perbarui statistik live di Modal Info KKN
+function updateInfoKKNStats() {
+    const umkmStat = document.getElementById("kkn-stat-umkm");
+    const catStat = document.getElementById("kkn-stat-category");
+    const openStat = document.getElementById("kkn-stat-open");
+
+    const data = (typeof umkmData !== "undefined" && umkmData.length > 0) ? umkmData : (window.umkmData || []);
+
+    if (umkmStat) {
+        umkmStat.textContent = data.length;
+    }
+    if (catStat) {
+        const categories = new Set(data.map(u => u.category));
+        catStat.textContent = categories.size;
+    }
+    if (openStat) {
+        const openCount = data.filter(u => {
+            return isCurrentlyOpen(u.jamOperasional, u.hariOperasional, u.jamOperasionalKhusus) === true;
+        }).length;
+        openStat.textContent = openCount;
+    }
+}
+
 // Fungsi membuka & menutup Modal Info KKN
 function openInfoKKNModal() {
+    updateInfoKKNStats();
     const modal = document.getElementById("info-kkn-modal");
     if (modal) modal.style.display = "flex";
 }
@@ -1183,14 +1319,127 @@ function closeInfoKKNModal() {
     if (modal) modal.style.display = "none";
 }
 
+// Toggle Simpan Favorit (localStorage)
+function toggleFavorite(id, btnElement) {
+    const index = favoritesList.indexOf(id);
+    if (index > -1) {
+        favoritesList.splice(index, 1);
+        showToast("Dihapus dari daftar favorit");
+    } else {
+        favoritesList.push(id);
+        showToast("Disimpan ke daftar favorit!");
+    }
+    localStorage.setItem("radar_umkm_favorites", JSON.stringify(favoritesList));
+    
+    updateFavoriteCount();
+
+    // Update ikon di kartu
+    const card = cardInstances[id];
+    if (card) {
+        const btn = card.querySelector(".fav-card-btn");
+        if (btn) {
+            const isFav = favoritesList.includes(id);
+            btn.className = `fav-card-btn ${isFav ? 'active' : ''}`;
+            btn.title = isFav ? 'Hapus dari Favorit' : 'Simpan ke Favorit';
+            btn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+        }
+    }
+
+    if (btnElement && btnElement.classList.contains("fav-card-btn")) {
+        const isFav = favoritesList.includes(id);
+        btnElement.className = `fav-card-btn ${isFav ? 'active' : ''}`;
+        btnElement.title = isFav ? 'Hapus dari Favorit' : 'Simpan ke Favorit';
+        btnElement.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+    }
+
+    if (isFavoritesOnly) {
+        renderAppContent();
+    }
+}
+
+function updateFavoriteCount() {
+    const favCountEl = document.getElementById("fav-count");
+    if (favCountEl) {
+        favCountEl.textContent = favoritesList.length;
+    }
+}
+
 // Daftarkan ke Global Scope
 window.openStoryModal = openStoryModal;
 window.shareLink = shareLink;
 window.openInfoKKNModal = openInfoKKNModal;
 window.closeInfoKKNModal = closeInfoKKNModal;
+window.toggleFavorite = toggleFavorite;
+
+// Global Drag-to-Scroll utilitas menggunakan mouse (Desktop UX)
+let activeDragEl = null;
+let dragStartX = 0;
+let dragScrollLeft = 0;
+let isDraggingMoved = false;
+
+document.addEventListener('mousedown', (e) => {
+    // Cari elemen terdekat yang memiliki scroll horizontal
+    const container = e.target.closest('.category-tabs, .story-gallery, .popup-gallery');
+    if (!container) return;
+    
+    // Abaikan jika yang diklik adalah tombol navigasi atau link
+    if (e.target.closest('button, a')) return;
+
+    activeDragEl = container;
+    isDraggingMoved = false;
+    activeDragEl.style.scrollBehavior = 'auto';
+    dragStartX = e.pageX - activeDragEl.offsetLeft;
+    dragScrollLeft = activeDragEl.scrollLeft;
+});
+
+document.addEventListener('mouseleave', () => {
+    if (activeDragEl) {
+        activeDragEl.style.scrollBehavior = 'smooth';
+        activeDragEl = null;
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (activeDragEl) {
+        activeDragEl.style.scrollBehavior = 'smooth';
+        activeDragEl = null;
+    }
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!activeDragEl) return;
+    e.preventDefault();
+    const x = e.pageX - activeDragEl.offsetLeft;
+    const walk = (x - dragStartX) * 1.5;
+    if (Math.abs(walk) > 3) {
+        isDraggingMoved = true;
+        activeDragEl.scrollLeft = dragScrollLeft - walk;
+    }
+});
+
+// Cegah klik terpicu pada elemen anak jika pengguna sebenarnya melakukan geser (drag)
+document.addEventListener('click', (e) => {
+    if (isDraggingMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+        isDraggingMoved = false;
+    }
+}, true);
+
+// Konversi scroll wheel vertikal mouse menjadi scroll horizontal di desktop
+document.addEventListener('wheel', (e) => {
+    const container = e.target.closest('.category-tabs, .story-gallery, .popup-gallery');
+    if (!container) return;
+    
+    if (e.deltaY !== 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+    }
+}, { passive: false });
 
 // Pasang event listener penutup modal
 document.addEventListener("DOMContentLoaded", () => {
+    updateFavoriteCount();
     // 1. Event listener Modal Kisah
     const closeBtn = document.getElementById("close-story-btn");
     if (closeBtn) closeBtn.addEventListener("click", closeStoryModal);

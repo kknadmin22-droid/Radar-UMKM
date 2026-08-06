@@ -22,7 +22,7 @@
     --radius-sm: 8px;
     
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
     --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -67,9 +67,7 @@ html {
 }
 
 .leaflet-bar a {
-    background-color: var(--glass-bg) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     color: var(--neutral-dark) !important;
     transition: var(--transition-smooth);
@@ -97,16 +95,14 @@ html {
 
 .floating-panel {
     pointer-events: auto; /* Re-enable pointer events for panels */
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: var(--transition-smooth);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, box-shadow 0.3s ease;
 }
 
 .floating-panel:hover {
@@ -125,7 +121,7 @@ html {
 .app-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .logo-area {
@@ -134,31 +130,31 @@ html {
     gap: 12px;
 }
 
-.logo-icon {
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    border-radius: var(--radius-md);
+.app-logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 12px rgba(var(--primary-hue), 70%, 20%, 0.2);
 }
 
-.app-header h1 {
-    font-size: 1.2rem;
+.logo-title {
+    font-size: 1.15rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.4px;
     color: var(--primary);
-    line-height: 1.2;
+    line-height: 1.15;
 }
 
-.app-header .subtitle {
-    font-size: 0.75rem;
-    font-weight: 500;
+.logo-subtitle {
+    font-size: 0.72rem;
+    font-weight: 600;
     color: var(--neutral-medium);
+    letter-spacing: 0.2px;
 }
 
 /* Search Box */
@@ -229,12 +225,37 @@ html {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(13, 148, 136, 0.5) rgba(0, 0, 0, 0.05);
 }
 
-.category-tabs::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+@media (max-width: 767px) {
+    .category-tabs {
+        scrollbar-width: none; /* Sembunyikan scrollbar di HP agar tampilan bersih */
+        padding-bottom: 4px;
+    }
+    .category-tabs::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .category-tabs::-webkit-scrollbar {
+        height: 6px;
+        display: block;
+    }
+    .category-tabs::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 10px;
+    }
+    .category-tabs::-webkit-scrollbar-thumb {
+        background: rgba(13, 148, 136, 0.5);
+        border-radius: 10px;
+    }
+    .category-tabs::-webkit-scrollbar-thumb:hover {
+        background: rgba(13, 148, 136, 0.85);
+    }
 }
 
 .category-tab {
@@ -270,11 +291,40 @@ html {
     box-shadow: 0 4px 10px rgba(var(--primary-hue), 70%, 22%, 0.25);
 }
 
-/* List Panel (Bottom Left on Desktop) */
-.list-panel {
+/* Sidebar Panel Container (Desktop Flex Layout) */
+.sidebar-panel {
     grid-column: 1;
-    height: calc(100vh - 280px); /* Fill space below search panel */
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: calc(100vh - 48px);
+    pointer-events: none;
+}
+
+.search-panel {
+    width: 100%;
+    height: fit-content;
+    pointer-events: auto;
+}
+
+.list-panel {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    margin-top: 0;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    transition: flex 0.3s ease, max-height 0.3s ease;
+}
+
+@media (min-width: 769px) {
+    .list-panel.collapsed {
+        flex: 0 0 auto;
+    }
+    .list-panel.collapsed .list-content {
+        display: none;
+    }
 }
 
 .list-header {
@@ -954,6 +1004,7 @@ html {
         padding: 12px;
         border-radius: var(--radius-md);
         gap: 10px;
+        background: rgba(255, 255, 255, 0.96);
     }
     
     .app-header {
@@ -963,8 +1014,8 @@ html {
     }
     
     .app-logo-img {
-        max-height: 32px;
-        max-width: 100px;
+        height: 32px;
+        width: auto;
     }
 
     .logo-title {
@@ -997,7 +1048,9 @@ html {
         box-shadow: 0 -4px 30px rgba(0,0,0,0.08);
         border: none;
         border-top: 1px solid var(--glass-border);
-        transform: translateY(0); /* Default state is open at 50% */
+        transform: translateY(0) translateZ(0); /* Default state is open at 50% */
+        background: rgba(255, 255, 255, 0.96);
+        will-change: transform;
     }
     
     /* Collapsed state of bottom sheet */
@@ -1026,7 +1079,7 @@ html {
     /* Reposition Leaflet Controls to not conflict with Bottom Sheet */
     .leaflet-bottom.leaflet-right {
         bottom: 52vh !important; /* Move zoom control above open bottom sheet */
-        transition: var(--transition-smooth);
+        transition: bottom 0.3s ease;
     }
     
     .list-panel.collapsed ~ #map .leaflet-bottom.leaflet-right,
@@ -1045,18 +1098,20 @@ html {
     width: 36px;
     height: 36px;
     border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
+    transform: rotate(-45deg) translateZ(0);
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.18);
     border: 2px solid #fff;
-    transition: var(--transition-bounce);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 .custom-leaflet-marker:hover .custom-marker-pin,
 .custom-leaflet-marker.active-marker .custom-marker-pin {
-    transform: rotate(-45deg) scale(1.18);
+    transform: rotate(-45deg) scale(1.18) translateZ(0);
     box-shadow: 0 6px 18px rgba(0,0,0,0.24);
 }
 
@@ -1069,57 +1124,11 @@ html {
 .custom-marker-shadow {
     width: 14px;
     height: 4px;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     margin-top: -3px;
     margin-left: 11px;
-    filter: blur(1px);
-    transition: var(--transition-bounce);
-    pointer-events: none;
-}
-
-}
-
-/* Custom Leaflet Marker Pins */
-.custom-leaflet-marker {
-    background: transparent;
-    border: none;
-}
-
-.custom-marker-pin {
-    width: 36px;
-    height: 36px;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-    border: 2px solid #fff;
-    transition: var(--transition-bounce);
-}
-
-.custom-leaflet-marker:hover .custom-marker-pin,
-.custom-leaflet-marker.active-marker .custom-marker-pin {
-    transform: rotate(-45deg) scale(1.18);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.24);
-}
-
-.custom-marker-pin i {
-    transform: rotate(45deg); /* Counter-rotate icon to make it upright */
-    color: #fff;
-    font-size: 0.95rem;
-}
-
-.custom-marker-shadow {
-    width: 14px;
-    height: 4px;
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 50%;
-    margin-top: -3px;
-    margin-left: 11px;
-    filter: blur(1px);
-    transition: var(--transition-bounce);
+    transition: transform 0.2s ease, opacity 0.2s ease;
     pointer-events: none;
 }
 
@@ -1778,27 +1787,63 @@ html {
     color: #fff;
 }
 
-/* Instagram Button */
-.kkn-instagram-btn {
+/* Social Media Actions in About Us Modal */
+.kkn-actions-section {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.kkn-social-btn {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    color: #fff !important;
+    gap: 8px;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 12px;
+    padding: 11px 12px;
     border-radius: var(--radius-md);
     text-align: center;
-    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.2);
     transition: var(--transition-bounce);
+    white-space: nowrap;
+}
+
+.kkn-social-btn:hover {
+    transform: translateY(-2px);
+}
+
+.kkn-instagram-btn {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff !important;
+    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.25);
 }
 
 .kkn-instagram-btn:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(220, 39, 67, 0.35);
+}
+
+.kkn-tiktok-btn {
+    background: #010101;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.kkn-tiktok-btn:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.kkn-tiktok-btn i {
+    color: #00f2fe;
+    text-shadow: -1px -1px 0 #fe2d52, 1px 1px 0 #fe2d52;
+}
+
+@media (max-width: 480px) {
+    .kkn-actions-section {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2009,4 +2054,221 @@ html {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px color-mix(in srgb, var(--sosmed-color) 40%, transparent);
 }
+
+/* ==========================================================================
+   DESKTOP DRAG-SCROLL & GALLERY CONTROLS
+   ========================================================================== */
+
+/* Cursor indicator for scrollable elements */
+.category-tabs, .story-gallery, .popup-gallery {
+    cursor: grab;
+    user-select: none;
+}
+
+.category-tabs:active, .story-gallery:active, .popup-gallery:active {
+    cursor: grabbing;
+}
+
+.popup-gallery-container {
+    position: relative;
+}
+
+/* Gallery navigation buttons (desktop) */
+.nav-gallery-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.2s, transform 0.2s, opacity 0.2s;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.nav-gallery-btn:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.nav-gallery-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.nav-gallery-btn i {
+    font-size: 1.1rem;
+}
+
+.nav-gallery-btn.prev-btn {
+    left: 12px;
+}
+
+.nav-gallery-btn.next-btn {
+    right: 12px;
+}
+
+/* Specific styling for small popup gallery buttons on map */
+.popup-nav-btn {
+    width: 28px;
+    height: 28px;
+}
+
+.popup-nav-btn i {
+    font-size: 0.85rem;
+}
+
+.popup-nav-btn.prev-btn {
+    left: 6px;
+}
+
+.popup-nav-btn.next-btn {
+    right: 6px;
+}
+
+/* ==========================================================================
+   OPTION A: QUICK FILTER BAR STYLING
+   ========================================================================== */
+
+.quick-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.quick-filter-pill {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-bounce);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Buka Sekarang (Belum dipencet / Idle) */
+.quick-filter-pill.filter-open-pill {
+    border: 1.5px solid rgba(16, 185, 129, 0.4);
+    background-color: rgba(236, 253, 245, 0.65);
+    color: #047857;
+}
+
+.quick-filter-pill.filter-open-pill i {
+    color: #10b981;
+}
+
+.quick-filter-pill.filter-open-pill:hover {
+    background-color: rgba(209, 250, 229, 0.9);
+    border-color: #10b981;
+    transform: translateY(-1px);
+}
+
+/* Buka Sekarang (Dipencet / Active) */
+.quick-filter-pill.filter-open-pill.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.quick-filter-pill.filter-open-pill.active i {
+    color: #a7f3d0;
+}
+
+/* Favorit (Belum dipencet / Idle) */
+.quick-filter-pill.filter-fav-pill {
+    border: 1.5px solid rgba(244, 63, 94, 0.4);
+    background-color: rgba(255, 241, 242, 0.65);
+    color: #be123c;
+}
+
+.quick-filter-pill.filter-fav-pill i {
+    color: #f43f5e;
+}
+
+.quick-filter-pill.filter-fav-pill:hover {
+    background-color: rgba(254, 205, 211, 0.9);
+    border-color: #f43f5e;
+    transform: translateY(-1px);
+}
+
+/* Favorit (Dipencet / Active) */
+.quick-filter-pill.filter-fav-pill.active {
+    background: linear-gradient(135deg, #f43f5e, #e11d48);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
+}
+
+.quick-filter-pill.filter-fav-pill.active i {
+    color: #fecdd3;
+}
+
+/* Favorite Heart Buttons */
+.fav-card-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.15rem;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+    border-radius: 50%;
+}
+
+.fav-card-btn:hover {
+    transform: scale(1.25);
+    color: #f43f5e;
+}
+
+.fav-card-btn.active {
+    color: #f43f5e;
+    animation: heart-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes heart-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+
+.btn-fav-modal {
+    background: #fff0f3;
+    color: #e11d48 !important;
+    border: 1px solid #fecdd3;
+    font-weight: 700;
+}
+
+.btn-fav-modal:hover {
+    background: #ffe4e6;
+    transform: translateY(-1px);
+}
+
+.btn-fav-modal.active {
+    background: #f43f5e;
+    color: #fff !important;
+    border-color: transparent;
+}
+
+
+
 

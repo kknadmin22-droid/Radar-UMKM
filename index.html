@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260806_v8">
 </head>
 <body>
 
@@ -39,75 +39,84 @@
     <!-- UI Panel Floating -->
     <main class="app-container">
         
-        <!-- Header & Pencarian Panel -->
-        <section class="floating-panel search-panel">
-            <header class="app-header">
-                <div class="logo-area">
-                    <img src="asset_gambar/logo_main.png" alt="Logo KKN UPN" class="app-logo-img">
-                    <div class="logo-text-container">
-                        <span class="logo-title">Radar UMKM</span>
-                        <span class="logo-subtitle">Desa Campurejo</span>
+        <!-- Sidebar Panel Wrapper (Desktop & Mobile Grid Container) -->
+        <aside class="sidebar-panel">
+            <!-- Header & Pencarian Panel -->
+            <section class="floating-panel search-panel">
+                <header class="app-header">
+                    <div class="logo-area">
+                        <img src="asset_gambar/logo_main.png" alt="Logo KKN UPN" class="app-logo-img">
+                        <div class="logo-text-container">
+                            <span class="logo-title">Radar UMKM</span>
+                            <span class="logo-subtitle">Desa Campurejo</span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Search Input -->
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Cari nama UMKM atau produk..." autocomplete="off">
+                    <button id="clear-search" class="clear-btn" aria-label="Hapus pencarian">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Status Filters (Option A Row) -->
+                <div class="quick-filter-bar">
+                    <button class="quick-filter-pill filter-open-pill" id="btn-filter-open" role="tab" aria-selected="false">
+                        <i class="fa-solid fa-clock"></i> Buka Sekarang
+                    </button>
+                    <button class="quick-filter-pill filter-fav-pill" id="btn-filter-fav" role="tab" aria-selected="false">
+                        <i class="fa-solid fa-heart"></i> Favorit (<span id="fav-count">0</span>)
+                    </button>
+                </div>
+
+                <!-- Categories Filter (Horizontal Scrollable) -->
+                <div class="category-tabs" id="category-tabs" role="tablist">
+                    <button class="category-tab active" data-category="all" role="tab" aria-selected="true">Semua</button>
+                    <button class="category-tab" data-category="Kuliner" role="tab" aria-selected="false"><i class="fa-solid fa-utensils"></i> Kuliner</button>
+                    <button class="category-tab" data-category="Jasa" role="tab" aria-selected="false"><i class="fa-solid fa-screwdriver-wrench"></i> Jasa</button>
+                    <button class="category-tab" data-category="Kerajinan" role="tab" aria-selected="false"><i class="fa-solid fa-scissors"></i> Kerajinan</button>
+                    <button class="category-tab" data-category="Pertanian" role="tab" aria-selected="false"><i class="fa-solid fa-wheat-awn"></i> Pertanian</button>
+                    <button class="category-tab" data-category="Belanja" role="tab" aria-selected="false"><i class="fa-solid fa-store"></i> Belanja</button>
+                </div>
+            </section>
+
+            <!-- Bottom Sheet / Daftar UMKM Panel -->
+            <section class="floating-panel list-panel" id="list-panel">
+                <!-- Handle untuk Geser Bottom Sheet pada Mobile -->
+                <div class="bottom-sheet-handle"></div>
+                
+                <div class="list-header">
+                    <h2 class="list-title">Pelaku Usaha Terdaftar (<span id="umkm-count">0</span>)</h2>
+                    <button id="toggle-list-btn" class="toggle-list-btn" aria-label="Toggle Daftar">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- Scrollable List Area -->
+                <div class="list-content" id="umkm-list-container">
+                    <!-- Skeleton Loader saat Loading -->
+                    <div class="skeleton-wrapper" id="list-skeleton">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                    
+                    <!-- Daftar UMKM akan di-render di sini secara dinamis -->
+                    <div class="umkm-list" id="umkm-list" style="display: none;"></div>
+                    
+
+                    <!-- Pesan jika Hasil Pencarian Kosong -->
+                    <div class="empty-state" id="empty-state" style="display: none;">
+                        <i class="fa-solid fa-face-frown empty-icon"></i>
+                        <h3>UMKM Tidak Ditemukan</h3>
+                        <p>Coba gunakan kata kunci atau kategori yang lain.</p>
                     </div>
                 </div>
-            </header>
-
-            <!-- Search Input -->
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="search-input" placeholder="Cari nama UMKM atau produk..." autocomplete="off">
-                <button id="clear-search" class="clear-btn" aria-label="Hapus pencarian">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Categories Filter (Horizontal Scrollable) -->
-            <div class="category-tabs" id="category-tabs" role="tablist">
-                <button class="category-tab active" data-category="all" role="tab" aria-selected="true">Semua</button>
-                <button class="category-tab" data-category="Kuliner" role="tab" aria-selected="false"><i class="fa-solid fa-utensils"></i> Kuliner</button>
-                <button class="category-tab" data-category="Jasa" role="tab" aria-selected="false"><i class="fa-solid fa-screwdriver-wrench"></i> Jasa</button>
-                <button class="category-tab" data-category="Kerajinan" role="tab" aria-selected="false"><i class="fa-solid fa-scissors"></i> Kerajinan</button>
-                <button class="category-tab" data-category="Pertanian" role="tab" aria-selected="false"><i class="fa-solid fa-wheat-awn"></i> Pertanian</button>
-                <button class="category-tab" data-category="Belanja" role="tab" aria-selected="false"><i class="fa-solid fa-store"></i> Belanja</button>
-            </div>
-        </section>
-
-        <!-- Bottom Sheet / Daftar UMKM Panel -->
-        <section class="floating-panel list-panel" id="list-panel">
-            <!-- Handle untuk Geser Bottom Sheet pada Mobile -->
-            <div class="bottom-sheet-handle"></div>
-            
-            <div class="list-header">
-                <h2 class="list-title">Pelaku Usaha Terdaftar (<span id="umkm-count">0</span>)</h2>
-                <button id="toggle-list-btn" class="toggle-list-btn" aria-label="Toggle Daftar">
-                    <i class="fa-solid fa-chevron-up"></i>
-                </button>
-            </div>
-
-            <!-- Scrollable List Area -->
-            <div class="list-content" id="umkm-list-container">
-                <!-- Skeleton Loader saat Loading -->
-                <div class="skeleton-wrapper" id="list-skeleton">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                </div>
-                
-                <!-- Daftar UMKM akan di-render di sini secara dinamis -->
-                <div class="umkm-list" id="umkm-list" style="display: none;"></div>
-                
-                <!-- Kredit Pembuat (KKN 22) -->
-                <div class="list-footer-credits">
-                    Dibuat dengan <i class="fa-solid fa-heart animate-pulse"></i> oleh Kelompok KKN 22 Bojonegoro 2026 UPN JATIM
-                </div>
-                
-                <!-- Pesan jika Hasil Pencarian Kosong -->
-                <div class="empty-state" id="empty-state" style="display: none;">
-                    <i class="fa-solid fa-face-frown empty-icon"></i>
-                    <h3>UMKM Tidak Ditemukan</h3>
-                    <p>Coba gunakan kata kunci atau kategori yang lain.</p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </aside>
 
     </main>
 
@@ -153,42 +162,49 @@
                 <!-- Stats Grid -->
                 <div class="kkn-stats-grid">
                     <div class="kkn-stat-card">
-                        <span class="stat-number">100+</span>
+                        <span class="stat-number" id="kkn-stat-umkm">0</span>
                         <span class="stat-label">UMKM Terdata</span>
                     </div>
                     <div class="kkn-stat-card">
-                        <span class="stat-number">5</span>
+                        <span class="stat-number" id="kkn-stat-category">0</span>
                         <span class="stat-label">Kategori Usaha</span>
                     </div>
                     <div class="kkn-stat-card">
-                        <span class="stat-number">100%</span>
-                        <span class="stat-label">Peta Digital</span>
+                        <span class="stat-number" id="kkn-stat-open">0</span>
+                        <span class="stat-label">Buka Hari Ini</span>
                     </div>
                 </div>
 
                 <!-- Team Grid Section -->
                 <div class="kkn-team-section">
-                    <h4 class="kkn-section-title"><i class="fa-solid fa-users-gear"></i> Tim Pengembang</h4>
+                    <h4 class="kkn-section-title"><i class="fa-solid fa-users-gear"></i> Tim Pengembang KKN 22</h4>
                     <div class="kkn-teams-flex">
                         <div class="kkn-team-badge">
-                            <span class="badge-icon"><i class="fa-solid fa-code"></i></span>
+                            <span class="badge-icon"><i class="fa-solid fa-calendar-check"></i></span>
                             <div class="badge-text">
-                                <span class="badge-title">Divisi IT &amp; Digitalisasi</span>
-                                <span class="badge-desc">Rancang &amp; Kembangkan Aplikasi</span>
+                                <span class="badge-title">Divisi Acara</span>
+                                <span class="badge-desc">Rancang &amp; Kembangkan Program</span>
                             </div>
                         </div>
                         <div class="kkn-team-badge">
-                            <span class="badge-icon"><i class="fa-solid fa-palette"></i></span>
+                            <span class="badge-icon"><i class="fa-solid fa-camera-retro"></i></span>
                             <div class="badge-text">
-                                <span class="badge-title">Divisi Publikasi &amp; Desain</span>
+                                <span class="badge-title">Divisi PDD (Publikasi, Dekorasi &amp; Dokumentasi)</span>
                                 <span class="badge-desc">Visual, Media &amp; Konten Digital</span>
                             </div>
                         </div>
                         <div class="kkn-team-badge">
                             <span class="badge-icon"><i class="fa-solid fa-comments"></i></span>
                             <div class="badge-text">
-                                <span class="badge-title">Divisi Hubungan Masyarakat</span>
+                                <span class="badge-title">Divisi Hubungan Masyarakat (Humas)</span>
                                 <span class="badge-desc">Sosialisasi &amp; Koordinasi Pelaku Usaha</span>
+                            </div>
+                        </div>
+                        <div class="kkn-team-badge">
+                            <span class="badge-icon"><i class="fa-solid fa-boxes-packing"></i></span>
+                            <div class="badge-text">
+                                <span class="badge-title">Divisi Perlengkapan (Perkap)</span>
+                                <span class="badge-desc">Logistik, Sarana &amp; Infrastruktur</span>
                             </div>
                         </div>
                         <div class="kkn-team-badge flex-full-width">
@@ -201,10 +217,13 @@
                     </div>
                 </div>
 
-                <!-- Action Button / Instagram Link -->
+                <!-- Action Buttons / Social Links -->
                 <div class="kkn-actions-section">
-                    <a href="https://www.instagram.com/kkn22.campurejo/" target="_blank" class="kkn-instagram-btn">
-                        <i class="fa-brands fa-instagram"></i> Ikuti Perjalanan Kami di Instagram
+                    <a href="https://www.instagram.com/ceritakkn22.campurejo/" target="_blank" class="kkn-social-btn kkn-instagram-btn">
+                        <i class="fa-brands fa-instagram"></i> Instagram KKN 22
+                    </a>
+                    <a href="https://www.tiktok.com/@ceritakkncampurejo?_r=1&_t=ZS-98ecXjgFvcq" target="_blank" class="kkn-social-btn kkn-tiktok-btn">
+                        <i class="fa-brands fa-tiktok"></i> TikTok KKN 22
                     </a>
                 </div>
             </div>
@@ -238,8 +257,14 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="story-header-img" id="story-img-container" style="position: relative;">
+                <button id="prev-image-btn" class="nav-gallery-btn prev-btn" aria-label="Gambar Sebelumnya" style="display: none;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
                 <div class="story-gallery" id="story-gallery"></div>
                 <div class="gallery-dots" id="gallery-dots"></div>
+                <button id="next-image-btn" class="nav-gallery-btn next-btn" aria-label="Gambar Berikutnya" style="display: none;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
             <div class="story-content">
                 <div class="story-meta">
@@ -250,8 +275,9 @@
                     Narasi cerita...
                 </div>
                 <div class="story-actions">
-                    <a href="" id="story-wa-btn" target="_blank" class="btn btn-primary"><i class="fa-brands fa-whatsapp"></i> Hubungi WhatsApp</a>
-                    <a href="" id="story-maps-btn" target="_blank" class="btn btn-secondary"><i class="fa-solid fa-map-location-dot"></i> Rute Google Maps</a>
+                    <button id="story-fav-btn" class="btn btn-fav-modal" aria-label="Simpan Favorit"><i class="fa-regular fa-heart"></i> Favorit</button>
+                    <a href="" id="story-wa-btn" target="_blank" class="btn btn-primary"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                    <a href="" id="story-maps-btn" target="_blank" class="btn btn-secondary"><i class="fa-solid fa-map-location-dot"></i> Rute Gmaps</a>
                 </div>
             </div>
         </div>
@@ -267,6 +293,6 @@
 
             
     <!-- Custom JS Application Logic -->
-    <script src="app.js"></script>
+    <script src="app.js?v=20260806_v8"></script>
 </body>
 </html>
