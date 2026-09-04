@@ -1817,5 +1817,22 @@
     "hari_operasional": "Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu",
     "jam_operasional_khusus": "",
     "link_sosmed": ""
+  },
+  {
+    "nama_usaha": "action2",
+    "kategori": "Kerajinan",
+    "deskripsi": "action2",
+    "latitude": "-7.148569",
+    "longitude": "111.904.467",
+    "kontak_wa": "088227127812",
+    "link_foto": "",
+    "link_gmaps": "",
+    "id_unik": "action2",
+    "produk_unggulan": "",
+    "jam_operasional": "09.00 - 10.00",
+    "cerita_umkm": "",
+    "hari_operasional": "Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu",
+    "jam_operasional_khusus": "",
+    "link_sosmed": ""
   }
 ]
