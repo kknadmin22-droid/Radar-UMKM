@@ -2,8 +2,8 @@ name: Sync Data & Build Jamstack Cache
 
 on:
   schedule:
-    # Berjalan otomatis setiap 6 jam
-    - cron: '0 */6 * * *'
+    # Berjalan otomatis setiap 1 jam sekali
+    - cron: '0 * * * *'
   workflow_dispatch:
     # Izinkan jalankan manual via tombol 'Run workflow' di tab Actions GitHub
 
