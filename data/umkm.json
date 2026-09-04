@@ -1800,5 +1800,22 @@
     "hari_operasional": "Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu",
     "jam_operasional_khusus": "",
     "link_sosmed": "https://jeo-cafe.blogspot.com/?m=1"
+  },
+  {
+    "nama_usaha": "tes action",
+    "kategori": "Kerajinan",
+    "deskripsi": "action",
+    "latitude": "-7.149569",
+    "longitude": "111.903.416",
+    "kontak_wa": "08822815213123",
+    "link_foto": "",
+    "link_gmaps": "",
+    "id_unik": "action",
+    "produk_unggulan": "action",
+    "jam_operasional": "08:00 - 17:00",
+    "cerita_umkm": "",
+    "hari_operasional": "Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu",
+    "jam_operasional_khusus": "",
+    "link_sosmed": ""
   }
 ]
