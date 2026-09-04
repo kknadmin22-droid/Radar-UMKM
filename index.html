@@ -4,20 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Radar UMKM Campurejo — Peta Interaktif UMKM Desa Campurejo</title>
-    
-    <!-- Meta Tags SEO -->
+        <!-- Meta Tags SEO & Open Graph -->
     <meta name="description" content="Temukan dan jelajahi produk serta jasa unggulan dari pelaku UMKM di Desa Campurejo, Bojonegoro melalui peta interaktif. Hubungi langsung via WhatsApp.">
     <meta name="keywords" content="UMKM Campurejo, Radar UMKM, Bojonegoro, Peta UMKM, KKN Campurejo, UMKM Bojonegoro, Kuliner Campurejo">
-    <meta name="author" content="KKN Desa Campurejo Bojonegoro">
+    <meta name="author" content="KKN 22 UPN Veteran Jawa Timur Desa Campurejo">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#10b981">
     
-    <!-- Open Graph / Facebook -->
+    <!-- Google Search Console & Analytics GA4 Placeholder -->
+    <!-- <meta name="google-site-verification" content="MASUKKAN_KODE_VERIFIKASI_GSC_DI_SINI" /> -->
+    <!-- Google tag (gtag.js) GA4 placeholder:
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script> -->
+    
+    <!-- Geo Meta Tags (Bojonegoro - Campurejo) -->
+    <meta name="geo.region" content="ID-JI">
+    <meta name="geo.placename" content="Campurejo, Bojonegoro">
+    <meta name="geo.position" content="-7.1488;111.9018">
+    <meta name="ICBM" content="-7.1488, 111.9018">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Radar UMKM Campurejo — Peta Interaktif">
-    <meta property="og:description" content="Temukan produk dan jasa unggulan dari pelaku UMKM di Desa Campurejo, Bojonegoro. Langsung terhubung via WhatsApp.">
+    <meta property="og:title" content="Radar UMKM Campurejo — Peta Interaktif Desa Campurejo">
+    <meta property="og:description" content="Jelajahi produk dan jasa unggulan pelaku UMKM di Desa Campurejo, Bojonegoro. Terhubung langsung via WhatsApp.">
+    <meta property="og:image" content="asset_gambar/logo_main.png">
+    <meta property="og:locale" content="id_ID">
     
-    <!-- Google Fonts: Inter -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Radar UMKM Campurejo — Peta Interaktif">
+    <meta name="twitter:description" content="Peta interaktif direktori UMKM Desa Campurejo, Bojonegoro.">
+    <meta name="twitter:image" content="asset_gambar/logo_main.png">
+    
+    <!-- Preconnect Resource Hints untuk Kecepatan Loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Leaflet.js CSS -->
@@ -34,6 +64,45 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css?v=20260806_v9">
+
+    <!-- Schema.org JSON-LD Structured Data (Google Rich Results) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://radar-umkm-campurejo/#website",
+          "name": "Radar UMKM Campurejo",
+          "description": "Peta Interaktif Direktori UMKM Desa Campurejo, Bojonegoro",
+          "inLanguage": "id-ID"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://radar-umkm-campurejo/#organization",
+          "name": "KKN 22 UPN Veteran Jawa Timur Desa Campurejo",
+          "url": "https://radar-umkm-campurejo/",
+          "logo": "asset_gambar/logo_main.png"
+        },
+        {
+          "@type": "Place",
+          "@id": "https://radar-umkm-campurejo/#place",
+          "name": "Desa Campurejo",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Bojonegoro",
+            "addressRegion": "Jawa Timur",
+            "addressCountry": "ID"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -7.1488,
+            "longitude": 111.9018
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
 

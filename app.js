@@ -63,11 +63,12 @@ function initMap() {
         inertiaDeceleration: 3000
     }).setView(CAMPUREJO_CENTER, DEFAULT_ZOOM);
 
-    // Gunakan Tile Layer CartoDB Positron (OSM-based, modern, clean, gratis)
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20,
+    // Tile Layer OpenStreetMap Standard (Super Detail, Zoom In Sangat Dalam, 100% Gratis & Bebas API Key Watermark Selamanya)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: 'abc',
+        maxZoom: 19,
+        maxNativeZoom: 19,
         keepBuffer: 4,
         tileSize: 256
     }).addTo(map);
@@ -124,29 +125,89 @@ function loadBoundaryGeoJSON() {
  */
 function fetchUMKMData() {
     const urlParams = new URLSearchParams(window.location.search);
-    let urlToFetch = GOOGLE_SHEET_CSV_URL ? GOOGLE_SHEET_CSV_URL : LOCAL_FALLBACK_CSV;
     
+    // Uji coba data dummy khusus jika ada parameter ?test=
     if (urlParams.has('test')) {
         const testType = urlParams.get('test');
-        if (testType === 'large') {
-            urlToFetch = "data/dummy_umkm_large.csv";
-        } else {
-            urlToFetch = LOCAL_FALLBACK_CSV;
-        }
+        const testUrl = testType === 'large' ? "data/dummy_umkm_large.csv" : LOCAL_FALLBACK_CSV;
+        fetch(testUrl)
+            .then(res => res.text())
+            .then(csvText => parseCSVData(csvText))
+            .catch(err => showErrorOverlay(err.message));
+        return;
     }
-    
-    fetch(urlToFetch)
+
+    // 1. Prioritas Utama: Baca data/umkm.json (Cache Jamstack CDN Super Cepat)
+    fetch("data/umkm.json")
         .then(response => {
-            if (!response.ok) throw new Error(`Status HTTP: ${response.status}`);
-            return response.text();
+            if (!response.ok) throw new Error("JSON cache tidak ditemukan");
+            return response.json();
         })
-        .then(csvString => {
-            parseCSVData(csvString);
+        .then(jsonData => {
+            console.log(`⚡ [Jamstack Cache] Memuat ${jsonData.length} UMKM dari data/umkm.json`);
+            processUMKMArrayData(jsonData);
         })
-        .catch(error => {
-            console.error("Gagal mengambil data UMKM:", error);
-            showErrorOverlay(error.message);
+        .catch(jsonError => {
+            console.warn("⚠️ [Jamstack Fallback] Memuat via CSV Google Sheet/Fallback...", jsonError);
+            // 2. Fallback Cadangan: Baca CSV jika JSON belum tersedia
+            const fallbackUrl = GOOGLE_SHEET_CSV_URL ? GOOGLE_SHEET_CSV_URL : LOCAL_FALLBACK_CSV;
+            fetch(fallbackUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Status HTTP: ${response.status}`);
+                    return response.text();
+                })
+                .then(csvString => parseCSVData(csvString))
+                .catch(error => {
+                    console.error("Gagal mengambil data UMKM:", error);
+                    showErrorOverlay(error.message);
+                });
         });
+}
+
+function processUMKMArrayData(rawData) {
+    if (!rawData || rawData.length === 0) return;
+    
+    // Reset cache render
+    isFirstRender = true;
+    for (const key in markerInstances) delete markerInstances[key];
+    for (const key in cardInstances) delete cardInstances[key];
+    
+    umkmData = rawData.map(item => {
+        const latVal = cleanCoordinate(item.latitude);
+        const lngVal = cleanCoordinate(item.longitude);
+        const hasCoords = !isNaN(latVal) && !isNaN(lngVal);
+
+        return {
+            id: item.id_unik ? item.id_unik.trim() : generateSlug(item.nama_usaha),
+            name: item.nama_usaha ? item.nama_usaha.trim() : "UMKM Tanpa Nama",
+            category: item.kategori ? item.kategori.trim() : "Lainnya",
+            description: item.deskripsi ? item.deskripsi.trim() : "Tidak ada deskripsi.",
+            lat: latVal,
+            lng: lngVal,
+            hasValidCoords: hasCoords,
+            whatsapp: item.kontak_wa ? sanitizeWhatsAppNumber(item.kontak_wa) : "",
+            photoUrls: item.link_foto ? convertGoogleDriveLinks(item.link_foto.trim()) : [],
+            photoUrl: item.link_foto ? convertGoogleDriveLinks(item.link_foto.trim())[0] || "" : "",
+            linkGmaps: item.link_gmaps ? item.link_gmaps.trim() : "",
+            produkUnggulan: item.produk_unggulan ? item.produk_unggulan.trim() : "",
+            jamOperasional: item.jam_operasional ? item.jam_operasional.trim() : "",
+            hariOperasional: item.hari_operasional ? item.hari_operasional.trim() : "",
+            jamOperasionalKhusus: item.jam_operasional_khusus ? item.jam_operasional_khusus.trim() : "",
+            ceritaUmkm: item.cerita_umkm ? item.cerita_umkm.trim() : "",
+            linkSosmed: item.link_sosmed ? item.link_sosmed.trim() : "",
+            rawWhatsApp: item.kontak_wa || ""
+        };
+    });
+    
+    // Urutkan alfabetis berdasarkan nama
+    umkmData.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Sembunyikan loader awal
+    const loader = document.getElementById("initial-loader");
+    if (loader) loader.style.display = "none";
+    
+    // Render isi aplikasi (marker & list)
+    renderAppContent();
 }
 
 function parseCSVData(csvString) {
@@ -156,56 +217,13 @@ function parseCSVData(csvString) {
         transformHeader: (header) => header.trim(),
         complete: (results) => {
             if (results.data && results.data.length > 0) {
-                // Reset cache render
-                isFirstRender = true;
-                for (const key in markerInstances) delete markerInstances[key];
-                for (const key in cardInstances) delete cardInstances[key];
-                
-                // Bersihkan dan normalisasi data dari CSV
-                umkmData = results.data.map(item => {
-                    const latVal = cleanCoordinate(item.latitude);
-                    const lngVal = cleanCoordinate(item.longitude);
-                    const hasCoords = !isNaN(latVal) && !isNaN(lngVal);
-
-                    return {
-                        id: item.id_unik ? item.id_unik.trim() : generateSlug(item.nama_usaha),
-                        name: item.nama_usaha ? item.nama_usaha.trim() : "UMKM Tanpa Nama",
-                        category: item.kategori ? item.kategori.trim() : "Lainnya",
-                        description: item.deskripsi ? item.deskripsi.trim() : "Tidak ada deskripsi.",
-                        lat: latVal,
-                        lng: lngVal,
-                        hasValidCoords: hasCoords,
-                        whatsapp: item.kontak_wa ? sanitizeWhatsAppNumber(item.kontak_wa) : "",
-                        photoUrls: item.link_foto ? convertGoogleDriveLinks(item.link_foto.trim()) : [],
-                        photoUrl: item.link_foto ? convertGoogleDriveLinks(item.link_foto.trim())[0] || "" : "",
-                        linkGmaps: item.link_gmaps ? item.link_gmaps.trim() : "",
-                        produkUnggulan: item.produk_unggulan ? item.produk_unggulan.trim() : "",
-                        jamOperasional: item.jam_operasional ? item.jam_operasional.trim() : "",
-                        hariOperasional: item.hari_operasional ? item.hari_operasional.trim() : "",
-                        jamOperasionalKhusus: item.jam_operasional_khusus ? item.jam_operasional_khusus.trim() : "",
-                        ceritaUmkm: item.cerita_umkm ? item.cerita_umkm.trim() : "",
-                        linkSosmed: item.link_sosmed ? item.link_sosmed.trim() : "",
-                        rawWhatsApp: item.kontak_wa || "" // untuk pencarian
-                    };
-                });
-                
-                // Urutkan alfabetis berdasarkan nama
-                umkmData.sort((a, b) => a.name.localeCompare(b.name));
-
-                // Sembunyikan loaders awal
-                hideInitialLoader();
-                
-                // Render marker di peta & daftar di sidebar
-                renderAppContent();
-                
-                // Cek deep link jika ada
-                handleDeepLinking();
+                processUMKMArrayData(results.data);
             } else {
-                showErrorOverlay("Data Google Sheet kosong atau format tidak sesuai.");
+                showErrorOverlay("Data CSV kosong");
             }
         },
         error: (error) => {
-            showErrorOverlay(`Gagal mem-parsing file CSV: ${error.message}`);
+            showErrorOverlay(error.message);
         }
     });
 }
@@ -215,6 +233,9 @@ function parseCSVData(csvString) {
  */
 function renderAppContent() {
     const listContainer = document.getElementById("umkm-list");
+    const skeleton = document.getElementById("list-skeleton");
+    if (skeleton) skeleton.style.display = "none";
+    if (listContainer) listContainer.style.display = "flex";
     
     // 1. Buat marker dan card sekali saja di awal
     if (isFirstRender) {

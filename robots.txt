@@ -1,0 +1,6 @@
+# Sitemap & Crawler Directives for Radar UMKM Campurejo
+User-agent: *
+Allow: /
+
+# Sitemap Location
+Sitemap: https://kknadmin22-droid.github.io/Radar-UMKM/sitemap.xml
